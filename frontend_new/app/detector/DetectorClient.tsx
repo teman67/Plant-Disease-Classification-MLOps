@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useMemo, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import { downloadCsv, fetchAiDiagnosis, predictMixed } from "@/lib/api";
 import { AiDiagnosisResponse, PredictionItem } from "@/lib/types";
@@ -33,11 +33,9 @@ export default function DetectorClient() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [predictions, setPredictions] = useState<PredictionItem[]>([]);
-  const [previewByPredictionId, setPreviewByPredictionId] = useState<Record<string, string>>({});
   const [aiAdviceById, setAiAdviceById] = useState<Record<string, AiDiagnosisResponse>>({});
   const [aiErrorById, setAiErrorById] = useState<Record<string, string>>({});
   const [aiLoadingById, setAiLoadingById] = useState<Record<string, boolean>>({});
-  const objectPreviewUrlsRef = useRef<string[]>([]);
 
   const validUrls = useMemo(
     () =>
@@ -48,13 +46,6 @@ export default function DetectorClient() {
     [urlInput],
   );
 
-  useEffect(() => {
-    return () => {
-      objectPreviewUrlsRef.current.forEach((url) => URL.revokeObjectURL(url));
-      objectPreviewUrlsRef.current = [];
-    };
-  }, []);
-
   async function onPredict() {
     if (files.length === 0 && confirmedUrls.length === 0) {
       setError("Upload at least one image or provide one URL.");
@@ -64,36 +55,14 @@ export default function DetectorClient() {
     setLoading(true);
     setError(null);
 
-    const nextFilePreviewUrls = files.map((file) => URL.createObjectURL(file));
-
     try {
       const form = new FormData();
       files.forEach((file) => form.append("files", file));
       form.append("urls_json", JSON.stringify(confirmedUrls));
 
       const result = await predictMixed(form);
-
-      objectPreviewUrlsRef.current.forEach((url) => URL.revokeObjectURL(url));
-      objectPreviewUrlsRef.current = nextFilePreviewUrls;
-
-      let fileIdx = 0;
-      let urlIdx = 0;
-      const nextPreviewById: Record<string, string> = {};
-      result.predictions.forEach((item) => {
-        if (item.source_type === "file") {
-          nextPreviewById[item.id] = nextFilePreviewUrls[fileIdx] || "";
-          fileIdx += 1;
-          return;
-        }
-
-        nextPreviewById[item.id] = confirmedUrls[urlIdx] || item.source_name;
-        urlIdx += 1;
-      });
-
       setPredictions(result.predictions);
-      setPreviewByPredictionId(nextPreviewById);
     } catch (err) {
-      nextFilePreviewUrls.forEach((url) => URL.revokeObjectURL(url));
       setError(err instanceof Error ? err.message : "Prediction failed");
     } finally {
       setLoading(false);
@@ -226,11 +195,11 @@ export default function DetectorClient() {
               {item.errors.length > 0 ? <p className="alert error">{item.errors.join(" | ")}</p> : null}
 
               <div className="result-visual-row">
-                {previewByPredictionId[item.id] ? (
+                {item.image_preview ? (
                   <div className="result-image-wrap">
                     <img
                       className="result-image"
-                      src={previewByPredictionId[item.id]}
+                      src={item.image_preview}
                       alt={`Input image: ${item.source_name}`}
                       loading="lazy"
                     />

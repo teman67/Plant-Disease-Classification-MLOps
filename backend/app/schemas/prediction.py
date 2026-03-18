@@ -13,6 +13,7 @@ class PredictionResult(BaseModel):
     probabilities: dict[str, float] = Field(default_factory=dict)
     rgb_converted: bool = False
     treatment_suggestion: str | None = None
+    image_preview: str | None = None
     errors: list[str] = Field(default_factory=list)
 
 

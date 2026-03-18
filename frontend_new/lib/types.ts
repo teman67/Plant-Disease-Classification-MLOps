@@ -8,6 +8,7 @@ export type PredictionItem = {
   probabilities: Partial<Record<DiseaseClass, number>>;
   rgb_converted: boolean;
   treatment_suggestion: string | null;
+  image_preview: string | null;
   errors: string[];
 };
 

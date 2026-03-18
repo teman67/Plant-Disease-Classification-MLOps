@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+import base64
 from dataclasses import dataclass
+from io import BytesIO
 import ipaddress
 from pathlib import Path
 import socket
@@ -8,6 +10,7 @@ from urllib.parse import urlparse
 
 import numpy as np
 import requests
+from PIL import Image
 from requests import HTTPError
 
 from app.core.config import get_settings
@@ -15,6 +18,21 @@ from app.core.constants import CLASS_MAPPING, TREATMENT_SUGGESTIONS
 from app.schemas.prediction import PredictionResult
 from app.services.model_loader import model_registry
 from app.services.preprocess import load_pil_from_bytes, normalize_image
+
+
+def _make_thumbnail_data_url(payload: bytes, max_size: int = 160) -> str | None:
+    """Return a base64 JPEG data-URL thumbnail, or None on any failure."""
+    try:
+        img = Image.open(BytesIO(payload))
+        if img.mode != "RGB":
+            img = img.convert("RGB")
+        img.thumbnail((max_size, max_size), Image.LANCZOS)
+        buf = BytesIO()
+        img.save(buf, format="JPEG", quality=80)
+        encoded = base64.b64encode(buf.getvalue()).decode("ascii")
+        return f"data:image/jpeg;base64,{encoded}"
+    except Exception:
+        return None
 
 
 @dataclass
@@ -122,6 +140,7 @@ def predict_input_item(item: InputItem, item_id: str) -> PredictionResult:
             probabilities=probabilities,
             rgb_converted=rgb_converted,
             treatment_suggestion=TREATMENT_SUGGESTIONS[predicted_class],
+            image_preview=_make_thumbnail_data_url(item.payload),
             errors=[],
         )
     except Exception as exc:
@@ -133,6 +152,7 @@ def predict_input_item(item: InputItem, item_id: str) -> PredictionResult:
             probabilities={},
             rgb_converted=False,
             treatment_suggestion=None,
+            image_preview=_make_thumbnail_data_url(item.payload),
             errors=[str(exc)],
         )
 
