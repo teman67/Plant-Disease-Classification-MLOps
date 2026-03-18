@@ -160,4 +160,5 @@ def predict_input_item(item: InputItem, item_id: str) -> PredictionResult:
 def filename_or_fallback(name: str | None, index: int) -> str:
     if not name:
         return f"image_{index + 1}.png"
-    return Path(name).name
+    # Normalize Windows backslashes so Path().name works correctly on Linux too.
+    return Path(name.replace("\\", "/")).name
