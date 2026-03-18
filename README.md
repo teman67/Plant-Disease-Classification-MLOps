@@ -295,17 +295,64 @@ Based on the original project findings and retained artifact behavior:
 
 ## Testing
 
-Testing is covered through:
+The backend has a full pytest suite split into **unit tests** and **integration tests**.
 
-- Artifact-based validation from the original ML workflow (`jupyter_notebooks`).
-- UI flow checks for all pages.
-- Detector checks:
-  - file upload and URL ingestion
-  - prediction rendering
-  - probability outputs
-  - treatment suggestions
-  - CSV export
-- Frontend linting (`npm run lint`).
+### Install test dependencies
+
+From the `backend/` directory:
+
+```bash
+pip install -r requirements.txt -r requirements-dev.txt
+```
+
+### Unit tests (default)
+
+All external dependencies (model, dataset, joblib files) are mocked — no GPU or real
+artifacts required.
+
+```bash
+cd backend
+pytest
+```
+
+184 tests covering API routes, services, schemas, and configuration.
+
+### Integration tests
+
+Integration tests load the **real Keras model** (`plant_disease_detector.h5`) and read
+actual artifacts from `jupyter_notebooks/outputs/v2/`. They also use real images from
+`inputs/plants_dataset/`. The model loads once per session so the full suite finishes in
+~10 seconds after the initial load.
+
+```bash
+cd backend
+pytest -m integration
+```
+
+61 tests across four files:
+
+| File | What it tests |
+|---|---|
+| `test_integration_prediction.py` | Model loading and service-layer inference with real images |
+| `test_integration_api.py` | Full HTTP stack — uploads, batch predict, CSV report |
+| `test_integration_artifacts.py` | Joblib/pkl integrity, performance endpoint, visualizer montage |
+
+> **Skip condition** — if `plant_disease_detector.h5` is not found, all integration
+> tests are automatically skipped so CI stays green without the large model file.
+
+### Run everything
+
+```bash
+cd backend
+pytest -m "integration or not integration"
+```
+
+### Frontend linting
+
+```bash
+cd frontend_new
+npm run lint
+```
 
 ## Bugs
 
