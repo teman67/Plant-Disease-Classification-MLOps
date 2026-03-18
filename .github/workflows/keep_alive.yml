@@ -1,0 +1,21 @@
+name: Keep Backend Alive
+
+on:
+  schedule:
+    # Runs every 25 minutes to prevent Heroku dyno from sleeping (sleeps after 30 min idle)
+    - cron: "*/25 * * * *"
+  workflow_dispatch: # Allow manual trigger
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Heroku backend
+        run: |
+          STATUS=$(curl --silent --output /dev/null --write-out "%{http_code}" "${{ secrets.HEROKU_APP_URL }}/api/v1/health")
+          echo "Response status: $STATUS"
+          if [ "$STATUS" -lt 200 ] || [ "$STATUS" -ge 400 ]; then
+            echo "Health check failed with status $STATUS"
+            exit 1
+          fi
+          echo "Backend is alive!"
