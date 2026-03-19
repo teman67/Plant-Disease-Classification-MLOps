@@ -6,6 +6,8 @@ This is the migrated full-stack version of the original Streamlit dashboard.
 - Backend API: FastAPI (Python)
 - ML Inference: TensorFlow model and artifacts from `jupyter_notebooks/outputs/v2`
 
+## [Live Demo](https://plant-disease-classification-ml-ops.vercel.app/summary)
+
 ## Table of Contents
 
 - [Introduction](#introduction)
