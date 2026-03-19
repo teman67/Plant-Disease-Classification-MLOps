@@ -58,7 +58,7 @@ export default function SummaryPage() {
           </p>
           <p>
             Read complete project background in the {" "}
-            <a className="summary-inline-link" href="https://github.com/teman67/Plant-Disease-Classification-Project" target="_blank" rel="noreferrer">
+            <a className="summary-inline-link" href="https://github.com/teman67/Plant-Disease-Classification-MLOps" target="_blank" rel="noreferrer">
               repository README
             </a>
             .
