@@ -1,0 +1,42 @@
+# Git / version control
+.git
+.gitignore
+.github
+
+# Python caches
+**/__pycache__
+**/*.pyc
+**/*.pyo
+**/*.pyd
+**/.pytest_cache
+**/.mypy_cache
+
+# Virtual environments
+.venv
+venv
+env
+
+# Test infrastructure (not needed at runtime)
+backend/tests
+backend/pytest.ini
+backend/requirements-dev.txt
+
+# Frontend (separate image / service)
+frontend/
+frontend_new/
+
+# Jupyter notebooks and non-artifact outputs
+jupyter_notebooks/*.ipynb
+jupyter_notebooks/outputs/v2/*.png
+
+# Large dataset splits – only Test/ is needed (montage endpoint).
+# Train/ and Validation/ can be hundreds of MB.
+inputs/plants_dataset/Merged_split_images_swapped/Train/
+inputs/plants_dataset/Merged_split_images_swapped/Validation/
+
+# Misc
+*.md
+*.txt
+Procfile
+runtime.txt
+src/
