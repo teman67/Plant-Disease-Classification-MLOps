@@ -21,7 +21,7 @@ export default function AppShell({ children }: AppShellProps) {
           <p className="eyebrow">Plant Disease Classification</p>
           <h1 className="brand">Leaf Intelligence Console</h1>
         </div>
-        <a className="readme-link" href="https://github.com/teman67/Plant-Disease-Classification-Project" target="_blank" rel="noreferrer">
+        <a className="readme-link" href="https://github.com/teman67/Plant-Disease-Classification-MLOps" target="_blank" rel="noreferrer">
           Repository
         </a>
       </header>
