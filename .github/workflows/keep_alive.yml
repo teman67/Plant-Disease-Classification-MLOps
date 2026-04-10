@@ -2,8 +2,8 @@ name: Keep Backend Alive
 
 on:
   schedule:
-    # Every 20 minutes — gives buffer against GitHub's scheduler delays
-    - cron: "0 * * * *"  
+    # Every 60 minutes — gives buffer against GitHub's scheduler delays
+    - cron: "0 * * * *"    
   workflow_dispatch: # Allow manual trigger
 
 jobs:
