@@ -1,11 +1,10 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { API_BASE_URL } from "@/lib/api";
 
 const labels = ["Healthy", "Powdery", "Rust"] as const;
-const MONTAGE_TIMEOUT_MS = 90000;
 
 export default function VisualizerClient() {
   const [showHealthyPowdery, setShowHealthyPowdery] = useState(false);
@@ -15,17 +14,6 @@ export default function VisualizerClient() {
   const [showMontage, setShowMontage] = useState(false);
   const [selectedLabel, setSelectedLabel] = useState<(typeof labels)[number]>("Healthy");
   const [montageNonce, setMontageNonce] = useState<number | null>(null);
-  const [montageLoading, setMontageLoading] = useState(false);
-  const [montageError, setMontageError] = useState(false);
-  const montageTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  useEffect(() => {
-    return () => {
-      if (montageTimeoutRef.current) {
-        clearTimeout(montageTimeoutRef.current);
-      }
-    };
-  }, []);
 
   return (
     <section className="panel">
@@ -181,73 +169,17 @@ export default function VisualizerClient() {
                 </option>
               ))}
             </select>
-            <button
-              onClick={() => {
-                setMontageError(false);
-                setMontageLoading(true);
-                setMontageNonce(Date.now());
-                if (montageTimeoutRef.current) {
-                  clearTimeout(montageTimeoutRef.current);
-                }
-                montageTimeoutRef.current = setTimeout(() => {
-                  setMontageLoading(false);
-                  setMontageError(true);
-                }, MONTAGE_TIMEOUT_MS);
-              }}
-              disabled={montageLoading}
-            >
-              {montageLoading ? (
-                <span className="nav-pill-inner">
-                  <span className="spinner" role="status" aria-label="Generating" style={{ color: "#fff" }} />
-                  Generating...
-                </span>
-              ) : (
-                "Create Montage"
-              )}
-            </button>
+            <button onClick={() => setMontageNonce(Date.now())}>Create Montage</button>
           </div>
 
-          {montageLoading ? (
-            <div className="loading-inline-row">
-              <span className="spinner" role="status" aria-label="Loading" />
-              <p className="loading-inline-hint">
-                Building the montage on the backend — if the server was asleep, this first attempt may time
-                out after ~30s. If that happens, wait a few seconds and click Create Montage again.
-              </p>
-            </div>
-          ) : null}
-
-          {montageError ? (
-            <p className="alert error" style={{ marginTop: "12px" }}>
-              Could not load the montage (the backend may be unreachable). Please try again.
-            </p>
-          ) : null}
-
           {montageNonce ? (
-            <figure
-              className="asset-card page-card"
-              style={{ marginTop: "12px", display: montageLoading ? "none" : "block" }}
-            >
+            <figure className="asset-card page-card" style={{ marginTop: "12px" }}>
               <Image
-                key={montageNonce}
                 src={`${API_BASE_URL}/api/v1/visualizer/montage?label=${selectedLabel}&rows=9&cols=3&r=${montageNonce}`}
                 alt={`${selectedLabel} montage`}
                 width={760}
                 height={1900}
                 style={{ width: "100%", height: "auto" }}
-                onLoad={() => {
-                  if (montageTimeoutRef.current) {
-                    clearTimeout(montageTimeoutRef.current);
-                  }
-                  setMontageLoading(false);
-                }}
-                onError={() => {
-                  if (montageTimeoutRef.current) {
-                    clearTimeout(montageTimeoutRef.current);
-                  }
-                  setMontageLoading(false);
-                  setMontageError(true);
-                }}
               />
               <figcaption style={{ padding: "8px" }}>{selectedLabel} montage</figcaption>
             </figure>

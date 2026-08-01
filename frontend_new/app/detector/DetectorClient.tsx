@@ -166,26 +166,9 @@ export default function DetectorClient() {
           Confirm URLs
         </button>
         <button onClick={onPredict} disabled={loading}>
-          {loading ? (
-            <span className="nav-pill-inner">
-              <span className="spinner" role="status" aria-label="Predicting" style={{ color: "#fff" }} />
-              Predicting...
-            </span>
-          ) : (
-            "Predict"
-          )}
+          {loading ? "Predicting..." : "Predict"}
         </button>
       </div>
-
-      {loading ? (
-        <div className="loading-inline-row">
-          <span className="spinner" role="status" aria-label="Loading" />
-          <p className="loading-inline-hint">
-            Running inference on the backend — if the server was asleep, this first attempt may time out
-            after ~30s. If that happens, wait a few seconds and click Predict again.
-          </p>
-        </div>
-      ) : null}
 
       {confirmedUrls.length > 0 ? (
         <p className="alert">Confirmed URLs: {confirmedUrls.length}</p>
@@ -253,20 +236,9 @@ export default function DetectorClient() {
 
               <div className="actions" style={{ marginTop: "10px" }}>
                 <button onClick={() => onAskAi(item)} disabled={aiLoadingById[item.id] || !!item.errors.length}>
-                  {aiLoadingById[item.id] ? (
-                    <span className="nav-pill-inner">
-                      <span className="spinner" role="status" aria-label="Thinking" style={{ color: "#fff" }} />
-                      Thinking...
-                    </span>
-                  ) : (
-                    "Get AI Diagnosis (GPT-4.1)"
-                  )}
+                  {aiLoadingById[item.id] ? "Thinking..." : "Get AI Diagnosis (GPT-4.1)"}
                 </button>
               </div>
-
-              {aiLoadingById[item.id] ? (
-                <p className="loading-inline-hint">Asking the AI assistant — usually a few seconds, longer on first request.</p>
-              ) : null}
 
               {aiErrorById[item.id] ? <p className="alert error">{aiErrorById[item.id]}</p> : null}
 

@@ -97,7 +97,7 @@ class TestBuildMontage:
         finally:
             s.dataset_test_path = original
 
-    def test_output_is_valid_jpeg(self, tmp_path):
+    def test_output_is_valid_png(self, tmp_path):
         label_dir = tmp_path / "Rust"
         _write_test_images(label_dir, count=4)
 
@@ -108,7 +108,7 @@ class TestBuildMontage:
         try:
             result = build_montage("Rust", rows=2, cols=2)
             img = Image.open(io.BytesIO(result))
-            assert img.format == "JPEG"
+            assert img.format == "PNG"
         finally:
             s.dataset_test_path = original
 

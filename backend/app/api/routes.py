@@ -166,4 +166,4 @@ def visualizer_montage(label: str, rows: int = 3, cols: int = 3) -> Response:
     except FileNotFoundError as exc:
         raise HTTPException(status_code=404, detail=str(exc)) from exc
 
-    return Response(content=image_data, media_type="image/jpeg")
+    return Response(content=image_data, media_type="image/png")

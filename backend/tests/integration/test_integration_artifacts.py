@@ -155,13 +155,13 @@ class TestVisualizerRealDataset:
         assert isinstance(result, bytes)
         assert len(result) > 0
 
-    def test_build_montage_powdery_is_valid_jpeg(self):
+    def test_build_montage_powdery_is_valid_png(self):
         import io
         from PIL import Image
         from app.services.visualizer import build_montage
         result = build_montage("Powdery", rows=2, cols=2)
         img = Image.open(io.BytesIO(result))
-        assert img.format == "JPEG"
+        assert img.format == "PNG"
 
     def test_build_montage_rust_correct_dimensions(self):
         import io
