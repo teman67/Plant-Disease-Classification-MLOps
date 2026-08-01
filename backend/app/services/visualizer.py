@@ -57,5 +57,5 @@ def build_montage(label: str, rows: int = 3, cols: int = 3) -> bytes:
             montage.paste(tile, (x, y))
 
     out = BytesIO()
-    montage.save(out, format="PNG")
+    montage.save(out, format="JPEG", quality=85)
     return out.getvalue()
