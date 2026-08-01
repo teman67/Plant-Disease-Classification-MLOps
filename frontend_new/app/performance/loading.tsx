@@ -14,8 +14,8 @@ export default function PerformanceLoading() {
         <span className="spinner spinner-lg" role="status" aria-label="Loading" />
         <p className="loading-panel-title">Fetching performance data from the backend…</p>
         <p className="loading-panel-hint">
-          The API can take up to a minute to respond if the server has been idle (cold start). Hang tight,
-          this page will update automatically.
+          If the server was asleep, this first request may time out after ~30s. If the page shows an
+          error, wait a few seconds and refresh — the server will be warm by then.
         </p>
       </div>
 

@@ -181,7 +181,8 @@ export default function DetectorClient() {
         <div className="loading-inline-row">
           <span className="spinner" role="status" aria-label="Loading" />
           <p className="loading-inline-hint">
-            Running inference on the backend — this can take up to a minute if the server was idle (cold start).
+            Running inference on the backend — if the server was asleep, this first attempt may time out
+            after ~30s. If that happens, wait a few seconds and click Predict again.
           </p>
         </div>
       ) : null}

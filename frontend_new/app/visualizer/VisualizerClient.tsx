@@ -1,10 +1,11 @@
 "use client";
 
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { API_BASE_URL } from "@/lib/api";
 
 const labels = ["Healthy", "Powdery", "Rust"] as const;
+const MONTAGE_TIMEOUT_MS = 90000;
 
 export default function VisualizerClient() {
   const [showHealthyPowdery, setShowHealthyPowdery] = useState(false);
@@ -16,6 +17,15 @@ export default function VisualizerClient() {
   const [montageNonce, setMontageNonce] = useState<number | null>(null);
   const [montageLoading, setMontageLoading] = useState(false);
   const [montageError, setMontageError] = useState(false);
+  const montageTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (montageTimeoutRef.current) {
+        clearTimeout(montageTimeoutRef.current);
+      }
+    };
+  }, []);
 
   return (
     <section className="panel">
@@ -176,6 +186,13 @@ export default function VisualizerClient() {
                 setMontageError(false);
                 setMontageLoading(true);
                 setMontageNonce(Date.now());
+                if (montageTimeoutRef.current) {
+                  clearTimeout(montageTimeoutRef.current);
+                }
+                montageTimeoutRef.current = setTimeout(() => {
+                  setMontageLoading(false);
+                  setMontageError(true);
+                }, MONTAGE_TIMEOUT_MS);
               }}
               disabled={montageLoading}
             >
@@ -194,14 +211,15 @@ export default function VisualizerClient() {
             <div className="loading-inline-row">
               <span className="spinner" role="status" aria-label="Loading" />
               <p className="loading-inline-hint">
-                Building the montage on the backend — first request can take up to a minute (cold start).
+                Building the montage on the backend — if the server was asleep, this first attempt may time
+                out after ~30s. If that happens, wait a few seconds and click Create Montage again.
               </p>
             </div>
           ) : null}
 
           {montageError ? (
             <p className="alert error" style={{ marginTop: "12px" }}>
-              Could not load the montage. Please try again.
+              Could not load the montage (the backend may be unreachable). Please try again.
             </p>
           ) : null}
 
@@ -217,8 +235,16 @@ export default function VisualizerClient() {
                 width={760}
                 height={1900}
                 style={{ width: "100%", height: "auto" }}
-                onLoad={() => setMontageLoading(false)}
+                onLoad={() => {
+                  if (montageTimeoutRef.current) {
+                    clearTimeout(montageTimeoutRef.current);
+                  }
+                  setMontageLoading(false);
+                }}
                 onError={() => {
+                  if (montageTimeoutRef.current) {
+                    clearTimeout(montageTimeoutRef.current);
+                  }
                   setMontageLoading(false);
                   setMontageError(true);
                 }}
