@@ -1,4 +1,6 @@
-import Link from "next/link";
+"use client";
+
+import Link, { useLinkStatus } from "next/link";
 import { ReactNode } from "react";
 
 const navItems = [
@@ -12,6 +14,16 @@ const navItems = [
 type AppShellProps = {
   children: ReactNode;
 };
+
+function NavPillContent({ label }: { label: string }) {
+  const { pending } = useLinkStatus();
+  return (
+    <span className="nav-pill-inner">
+      {pending ? <span className="spinner" role="status" aria-label="Loading" /> : null}
+      {label}
+    </span>
+  );
+}
 
 export default function AppShell({ children }: AppShellProps) {
   return (
@@ -29,7 +41,7 @@ export default function AppShell({ children }: AppShellProps) {
       <nav className="nav-grid" aria-label="Primary">
         {navItems.map((item) => (
           <Link key={item.href} href={item.href} className="nav-pill">
-            {item.label}
+            <NavPillContent label={item.label} />
           </Link>
         ))}
       </nav>
