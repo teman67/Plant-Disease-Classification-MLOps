@@ -2,6 +2,8 @@
 
 import { useMemo, useState } from "react";
 import ReactMarkdown from "react-markdown";
+import LoadingState from "@/components/LoadingState";
+import Spinner from "@/components/Spinner";
 import { downloadCsv, fetchAiDiagnosis, predictMixed } from "@/lib/api";
 import { AiDiagnosisResponse, PredictionItem } from "@/lib/types";
 
@@ -166,9 +168,20 @@ export default function DetectorClient() {
           Confirm URLs
         </button>
         <button onClick={onPredict} disabled={loading}>
-          {loading ? "Predicting..." : "Predict"}
+          {loading ? (
+            <span className="btn-loading">
+              <Spinner size={14} />
+              Predicting...
+            </span>
+          ) : (
+            "Predict"
+          )}
         </button>
       </div>
+
+      {loading ? (
+        <LoadingState title="Running the model on your images..." />
+      ) : null}
 
       {confirmedUrls.length > 0 ? (
         <p className="alert">Confirmed URLs: {confirmedUrls.length}</p>
@@ -236,9 +249,23 @@ export default function DetectorClient() {
 
               <div className="actions" style={{ marginTop: "10px" }}>
                 <button onClick={() => onAskAi(item)} disabled={aiLoadingById[item.id] || !!item.errors.length}>
-                  {aiLoadingById[item.id] ? "Thinking..." : "Get AI Diagnosis (GPT-4.1)"}
+                  {aiLoadingById[item.id] ? (
+                    <span className="btn-loading">
+                      <Spinner size={14} />
+                      Thinking...
+                    </span>
+                  ) : (
+                    "Get AI Diagnosis (GPT-4.1)"
+                  )}
                 </button>
               </div>
+
+              {aiLoadingById[item.id] ? (
+                <LoadingState
+                  title="Asking the AI assistant for a diagnosis..."
+                  hint="The request goes through the backend to the language model, so it can take a few seconds."
+                />
+              ) : null}
 
               {aiErrorById[item.id] ? <p className="alert error">{aiErrorById[item.id]}</p> : null}
 

@@ -1,4 +1,4 @@
-import Image from "next/image";
+import BackendImage from "@/components/BackendImage";
 import { API_BASE_URL, fetchPerformance } from "@/lib/api";
 import { PerformanceResponse } from "@/lib/types";
 
@@ -51,12 +51,13 @@ export default async function PerformancePage() {
       </p>
       <figure className="perf-showcase perf-showcase-lg cards-stagger" style={{ marginBottom: "14px" }}>
         <div className="perf-image-wrap perf-image-wrap-lg">
-          <Image
+          <BackendImage
             src={`${API_BASE_URL}/static/v1/labels_distribution.png`}
             alt="Labels distribution"
             width={1100}
             height={560}
             style={{ width: "100%", height: "auto" }}
+            loadingLabel="Loading labels distribution chart..."
           />
         </div>
         <figcaption className="perf-caption">Label frequencies across train, validation, and test splits</figcaption>
@@ -69,24 +70,26 @@ export default async function PerformancePage() {
       <div className="perf-history-grid cards-stagger">
         <figure className="perf-showcase">
           <div className="perf-image-wrap perf-image-wrap-sm">
-            <Image
+            <BackendImage
               src={`${API_BASE_URL}/static/v1/model_training_acc.png`}
               alt="Model training accuracy"
               width={900}
               height={520}
               style={{ width: "100%", height: "auto" }}
+              loadingLabel="Loading accuracy history..."
             />
           </div>
           <figcaption className="perf-caption">Training vs validation accuracy trend</figcaption>
         </figure>
         <figure className="perf-showcase">
           <div className="perf-image-wrap perf-image-wrap-sm">
-            <Image
+            <BackendImage
               src={`${API_BASE_URL}/static/v1/model_training_losses.png`}
               alt="Model training losses"
               width={900}
               height={520}
               style={{ width: "100%", height: "auto" }}
+              loadingLabel="Loading loss history..."
             />
           </div>
           <figcaption className="perf-caption">Training vs validation loss trend</figcaption>
@@ -118,12 +121,13 @@ export default async function PerformancePage() {
       <h3 className="section-title">Confusion Matrix</h3>
       <figure className="perf-showcase perf-showcase-lg cards-stagger" style={{ marginBottom: "12px" }}>
         <div className="perf-image-wrap perf-image-wrap-lg">
-          <Image
+          <BackendImage
             src={`${API_BASE_URL}/static/v2/confusion_matrix.png`}
             alt="Confusion matrix plot"
             width={900}
             height={600}
             style={{ width: "100%", height: "auto" }}
+            loadingLabel="Loading confusion matrix..."
           />
         </div>
         <figcaption className="perf-caption">Confusion matrix highlighting true and false predictions</figcaption>

@@ -1,7 +1,9 @@
 "use client";
 
-import Image from "next/image";
 import { useState } from "react";
+import BackendImage from "@/components/BackendImage";
+import LoadingState from "@/components/LoadingState";
+import Spinner from "@/components/Spinner";
 import { API_BASE_URL } from "@/lib/api";
 
 const labels = ["Healthy", "Powdery", "Rust"] as const;
@@ -14,6 +16,7 @@ export default function VisualizerClient() {
   const [showMontage, setShowMontage] = useState(false);
   const [selectedLabel, setSelectedLabel] = useState<(typeof labels)[number]>("Healthy");
   const [montageNonce, setMontageNonce] = useState<number | null>(null);
+  const [montageLoading, setMontageLoading] = useState(false);
 
   return (
     <section className="panel">
@@ -69,7 +72,7 @@ export default function VisualizerClient() {
           </p>
           <div className="asset-grid">
             <figure className="asset-card page-card">
-              <Image
+              <BackendImage
                 src={`${API_BASE_URL}/static/v1/avg_var_Healthy.png`}
                 alt="Healthy Plant - Average and Variability"
                 width={900}
@@ -79,7 +82,7 @@ export default function VisualizerClient() {
               <figcaption style={{ padding: "8px" }}>Healthy Plant - Average and Variability</figcaption>
             </figure>
             <figure className="asset-card page-card">
-              <Image
+              <BackendImage
                 src={`${API_BASE_URL}/static/v1/avg_var_Powdery.png`}
                 alt="Powdery Plant - Average and Variability"
                 width={900}
@@ -99,7 +102,7 @@ export default function VisualizerClient() {
           </p>
           <div className="asset-grid">
             <figure className="asset-card page-card">
-              <Image
+              <BackendImage
                 src={`${API_BASE_URL}/static/v1/avg_var_Healthy.png`}
                 alt="Healthy Plant - Average and Variability"
                 width={900}
@@ -109,7 +112,7 @@ export default function VisualizerClient() {
               <figcaption style={{ padding: "8px" }}>Healthy Plant - Average and Variability</figcaption>
             </figure>
             <figure className="asset-card page-card">
-              <Image
+              <BackendImage
                 src={`${API_BASE_URL}/static/v1/avg_var_Rust.png`}
                 alt="Rust Plant - Average and Variability"
                 width={900}
@@ -128,7 +131,7 @@ export default function VisualizerClient() {
             We notice this study did not show patterns where we could intuitively differentiate one from another.
           </p>
           <figure className="asset-card page-card">
-            <Image
+            <BackendImage
               src={`${API_BASE_URL}/static/v1/avg_diff_label1_label2.png`}
               alt="Difference between average healthy and average powdery"
               width={900}
@@ -146,7 +149,7 @@ export default function VisualizerClient() {
             We notice this study did not show patterns where we could intuitively differentiate one from another.
           </p>
           <figure className="asset-card page-card">
-            <Image
+            <BackendImage
               src={`${API_BASE_URL}/static/v1/avg_diff_label1_label3.png`}
               alt="Difference between average healthy and average rust"
               width={900}
@@ -169,17 +172,45 @@ export default function VisualizerClient() {
                 </option>
               ))}
             </select>
-            <button onClick={() => setMontageNonce(Date.now())}>Create Montage</button>
+            <button
+              onClick={() => {
+                setMontageLoading(true);
+                setMontageNonce(Date.now());
+              }}
+              disabled={montageLoading}
+            >
+              {montageLoading ? (
+                <span className="btn-loading">
+                  <Spinner size={14} />
+                  Creating Montage...
+                </span>
+              ) : (
+                "Create Montage"
+              )}
+            </button>
           </div>
 
+          {montageLoading ? (
+            <LoadingState
+              title="Building the montage on the backend..."
+              hint="The server picks and stitches the images for you. This can take a while on the first request while Heroku wakes the backend up."
+            />
+          ) : null}
+
           {montageNonce ? (
-            <figure className="asset-card page-card" style={{ marginTop: "12px" }}>
-              <Image
+            <figure
+              className={`asset-card page-card montage-card${montageLoading ? " is-pending" : ""}`}
+              style={{ marginTop: "12px" }}
+            >
+              <BackendImage
                 src={`${API_BASE_URL}/api/v1/visualizer/montage?label=${selectedLabel}&rows=9&cols=3&r=${montageNonce}`}
                 alt={`${selectedLabel} montage`}
                 width={760}
                 height={1900}
                 style={{ width: "100%", height: "auto" }}
+                loadingLabel="Creating the montage..."
+                onLoad={() => setMontageLoading(false)}
+                onError={() => setMontageLoading(false)}
               />
               <figcaption style={{ padding: "8px" }}>{selectedLabel} montage</figcaption>
             </figure>
